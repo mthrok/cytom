@@ -45,6 +45,7 @@ iplogicore <- function (x, w, r, d, scale) {
     c = r * exp(-(d - w)) * p^2
     d = 1/p
     f = a * (p^2 - 1)
+    # print(paste("a=", a, "b=", b, "c=", c, "d=", d, "f=", f, "w=", w))
     y = .Call("biexponential_transform", as.double(x), a, b, c, d, f, w, tol, maxit)
     y = sapply(y * scale, ipfloor)
     y
@@ -211,7 +212,17 @@ convertfcs <- function(fcs) {
             
             if (debug) print("check spill")
             if (is.null(spill) == FALSE) {
-                tryCatch({ fcs = compensate(fcs, spill) }, error = function(ex) { str(ex); })
+               if (debug) {
+                 # print("Compensating")
+                 # print(spill)
+                 # cols <- colnames(spill)
+                 # e <- fcs@exprs
+                 # val <- t(solve(t(spill))%*%t(e[,cols]))
+                 # print(cols)
+                 # print("After compensation")
+                 # print(val[c(1:10),])
+               }
+               tryCatch({ fcs = compensate(fcs, spill) }, error = function(ex) { str(ex); })
             }
             
             if (debug) print("get expression")
@@ -220,20 +231,28 @@ convertfcs <- function(fcs) {
             fcs.channel = NULL
             markers = colnames(fcs)
             
+            # if (debug) print("keywards")
+            # if (debug) print(keywords)
             if (debug) print("loop through markers")
             for (i in 1:length(markers)){
                 markertype = getMarkerType(markers[i])
                 rangekeyword = paste("$P", i, "R", sep="")
-                #if (debug) print(paste("  range keyword:", rangekeyword))
+                if (debug) print(paste("  range keyword:", rangekeyword))
                 if (debug) print(paste("  range value:", keywords[rangekeyword]))
+                if (debug) print(paste("  markertype: ", markertype, sep=""))
                 channelrange = as.numeric(keywords[rangekeyword])
                 if (markertype == "SCATTER") {
                     channel = ipscatter(scaleData(fcs.exprs[, i], channelrange))
+                    if (debug) {
+                       # print(markers[i])
+                       # print(channel)
+                    }
                 } else if (markertype == "TIME") {
                     channel = iptime(fcs.exprs[, i])
                 } else {
                     # apply logicle transformation on fluorescent channels
                     channel = iplogicle(scaleData(fcs.exprs[, i], channelrange))
+                    # if (debug) print(channel)
                 }
                 fcs.channel = cbind(fcs.channel, round(channel))
             }
