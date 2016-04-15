@@ -51,7 +51,7 @@ def logicle_(X, w, r, d, scale):
 
     d = d * np.log(10)
     scale = scale / d
-    p = 1 if w == 0 else brenth(_func, 1e-10, 2*(w+d), args=(w,))
+    p = brenth(_func, 0.99, 1000, args=(w,))  # If w > 6, then this will raise
     a = r * np.exp(-(d-w))
     b = 1
     c = a * p * p
