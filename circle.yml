@@ -1,0 +1,11 @@
+dependencies:
+    pre:
+      - sudo apt-get update
+      - sudo apt-get install gfortran liblapack3 libopenblas-dev libatlas-base-dev
+    override:
+      - pip install . --upgrade
+    post:
+      # For python3 compatibility
+      - pip uninstall -y GoreUtilities FlowCytometryTools
+      - pip install git+https://bitbucket.org/gorelab/goreutilities@master
+      - pip install git+https://github.com/eyurtsev/FlowCytometryTools@master
