@@ -1,5 +1,7 @@
 import os
 import gzip
+import pickle
+
 import pandas as pd
 
 from FlowCytometryTools import FCMeasurement
@@ -10,6 +12,8 @@ _DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 
 def load_fcs_data(filename):
     filepath = os.path.join(_DATA_DIR, filename)
+    if filename.endswith('.pk'):
+        return pickle.load(filepath)
     return FCMeasurement(ID=filename, datafile=filepath)
 
 

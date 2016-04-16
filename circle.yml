@@ -9,3 +9,6 @@ dependencies:
       - pip uninstall -y GoreUtilities FlowCytometryTools
       - pip install git+https://bitbucket.org/gorelab/goreutilities@master
       - pip install git+https://github.com/eyurtsev/FlowCytometryTools@master
+      # Download test data
+      - ./bin/download_test_data.sh
+

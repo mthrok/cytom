@@ -94,29 +94,3 @@ def logicle(data, r=262144, d=4.5, scale=4096, cutoff=-111, w=-1):
     _LG.debug('params: r={}, d={}, scale={}, cutoff={}, w={}'
               .format(r, d, scale, cutoff, w))
     return logicle_(data, w, r, d, scale)
-
-
-###############################################################################
-def apply_logicle_transform(fcs, channels=None):
-    """Apply logicle transformation to  FLUO measurements"""
-    channel_info = fcs.meta['_channels_']
-    _LG.info('\n{}'.format(channel_info))
-    if channels is None:
-        channels = channel_info['$PnN']
-    for name, range_ in zip(channels, map(int, channel_info['$PnR'])):
-        markertype_ = markertype(name)
-        _LG.debug('Marker: {}, Type: {}, Range: {}'
-                  .format(name, markertype_, range_))
-        if markertype_ == 'TIME':
-            continue
-        data = fcs.data[name].values  # numpy.ndarray
-        if markertype_ == 'SCATTER':
-            range_ = max(int(data.max()), range_)
-            data = 4095.0 * data / range_
-            data[4095 < data] = 4095
-            data[data < 0] = 0
-        else:
-            range_ = max(int(data.max()), range_)
-            data = 262144 * data / range_
-            data = logicle(data, range_)
-        fcs.data = fcs.data.assign(**{name: data})
